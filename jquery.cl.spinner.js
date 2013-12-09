@@ -1,7 +1,7 @@
 
 /*
 
-v 0.0.1
+v 0.0.2
 
 
 by Christian Marienfeld
@@ -13,14 +13,25 @@ post@chrisland.de
 (function ( $ ) {
 
 
-	$.fn.clSpinner = function() {
+	$.fn.clSpinner = function(_options) {
 
 		this.each(function(i,k) {
 			var that = $(k),
 				spinnerDiv = $('<div></div>', {'class': 'spinner_wrap'}),
-				spinnerUp = $('<div>+</div>', {'class': 'spinner_up'}),
-				spinnerDown = $('<div>-</div>', {'class': 'spinner_down'});
-				
+				spinnerUp = $('<div></div>', {'class': 'spinner_trigger spinner_up'}),
+				spinnerDown = $('<div></div>', {'class': 'spinner_trigger spinner_down'});
+			
+			if (!_options.width) {
+				_options.width = '10px';
+			}
+			if (!_options.height) {
+				_options.height = '10px';
+			}
+			spinnerDiv.css({'width':_options.width, 'height':_options.height});
+			spinnerUp.css({'width':'100%', 'height':'100%'});
+			spinnerDown.css({'width':'100%', 'height':'100%'});
+			that.css('width', parseInt(that.css('width')) - parseInt(_options.width));
+			
 			that.on('keyup', function (e) {
 				if (e.keyCode == 38) {
 					that.trigger( "spinner-change", [ "add", e ] );
@@ -61,7 +72,7 @@ post@chrisland.de
 			});
 			
 			spinnerDiv.append(spinnerUp).append(spinnerDown);
-			$(k).after(spinnerDiv);
+			$(k).before(spinnerDiv);
 			
 		});	
 		return this;
