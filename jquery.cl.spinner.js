@@ -1,7 +1,7 @@
 
 /*
 
-v 0.0.2
+v 0.0.4
 
 
 by Christian Marienfeld
@@ -13,24 +13,32 @@ post@chrisland.de
 (function ( $ ) {
 
 
-	$.fn.clSpinner = function(_options) {
+	$.fn.clSpinner = function(options) {
 
 		this.each(function(i,k) {
+			
+			var settings = $.extend({
+				// These are the defaults.
+				width: "10px",
+				height: "10px"
+			}, options );
+			
+			
 			var that = $(k),
 				spinnerDiv = $('<div></div>', {'class': 'spinner_wrap'}),
 				spinnerUp = $('<div></div>', {'class': 'spinner_trigger spinner_up'}),
-				spinnerDown = $('<div></div>', {'class': 'spinner_trigger spinner_down'});
+				spinnerDown = $('<div></div>', {'class': 'spinner_trigger spinner_down'}); 
 			
-			if (!_options.width) {
-				_options.width = '10px';
-			}
-			if (!_options.height) {
-				_options.height = '10px';
-			}
-			spinnerDiv.css({'width':_options.width, 'height':_options.height});
+
+			spinnerDiv.css({'width':settings.width, 'height':settings.height});
 			spinnerUp.css({'width':'100%', 'height':'100%'});
 			spinnerDown.css({'width':'100%', 'height':'100%'});
-			that.css('width', parseInt(that.css('width')) - parseInt(_options.width));
+			
+			var newWidth = parseInt(that.css('width')) - parseInt(settings.width);
+			if (parseInt(newWidth) > 0) {
+				that.css('width', newWidth);
+			}
+			
 			
 			that.on('keyup', function (e) {
 				if (e.keyCode == 38) {
@@ -51,24 +59,30 @@ post@chrisland.de
 			
 			that.on('spinner-change', function(e, type, oldEvent) {
 				
-				var value = parseInt(that.val());
+				var value = parseFloat(that.val()),
+					step = that.data('spinner-step');
 				if (!value) {
 					value = 0;
 				}
+				if (!step) {
+					step = 1;
+				}
 				if (type == 'add') {
 					if (oldEvent.shiftKey) {
-						value += 10;
+						value += step *10;
 					} else {
-						value += 1;
+						value += step;
 					}
 				} else if (type == 'sub') {
 					if (oldEvent.shiftKey) {
-						value -= 10;
+						value -= step *10;
 					} else {
-						value -= 1;
+						value -= step;
 					}
 				}
+				value = Math.round(value*Math.pow(10,2))/Math.pow(10,2);
 				that.val( value );
+				that.trigger('change');
 			});
 			
 			spinnerDiv.append(spinnerUp).append(spinnerDown);
